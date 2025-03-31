@@ -4,10 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Финансовые графики</title>
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
-    <div id="chart" style="width: 800px; height: 600px;"></div>
-    <script src="app.js"></script>
+    <div id="tvchart"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+    new TradingView.widget({
+        "container_id": "tvchart",
+        "width": 980,
+        "height": 610,
+        "symbol": "NASDAQ:AAPL",  // Укажите символ (например, акции Apple)
+        "interval": "D",         // Интервал графика (D - дневной)
+        "timezone": "Etc/UTC",
+        "theme": "Light",        // Тема (светлая или темная)
+        "style": "1",            // Тип графика (1 - свечи)
+        "locale": "en",          // Язык интерфейса
+        "toolbar_bg": "#f1f3f6", // Цвет фона панели инструментов
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "details": true,
+        "hideideas": true
+    });
+    </script>
 </body>
-</html> 
+</html>

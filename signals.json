@@ -1,12 +1,12 @@
 [
     {
-        "instrument": "AAPL",
+        "instrument": "CL",
         "signal": "Buy",
-        "image": "images/aapl_chart.png"
+        "image": "images/CLMyScreenshot.png"
     },
     {
-        "instrument": "GOOG",
+        "instrument": "GC",
         "signal": "Sell",
-        "image": "images/goog_chart.png"
+        "image": "images/GCMyScreenshot.png"
     }
 ]

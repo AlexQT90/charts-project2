@@ -1,100 +1,28 @@
-// Функция для парсинга CSV
-function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n');
-    const data = lines.slice(1).map(line => {
-        const values = line.split(',');
-        return {
-            time: values[0]; // Формат, например, 'YYYY-MM-DD'
-            open: parseFloat(values[1]);
-            high: parseFloat(values[2]);
-            low: parseFloat(values[3]);
-            close: parseFloat(values[4]);
-        };
+const chart = LightweightCharts.createChart(document.getElementById('chart'), { width: 800, height: 600 });
+const candlestickSeries = chart.addCandlestickSeries();
+
+fetch('https://api.tradingview.com/v1/symbols/NASDAQ:AAPL/history?from=2022-01-01&to=2022-01-31&resolution=D', {
+    headers: { 'Authorization': 'Bearer ваш_api_ключ' }  // Замените на ваш ключ
+})
+.then(response => response.json())
+.then(data => {
+    const candles = data.t.map((time, index) => ({
+        time: time,
+        open: data.o[index],
+        high: data.h[index],
+        low: data.l[index],
+        close: data.c[index]
+    }));
+    candlestickSeries.setData(candles);
+
+    // Пример добавления кастомных линий
+    candlestickSeries.createPriceLine({
+        price: 150,          // Цена для линии
+        color: 'blue',       // Цвет линии
+        lineWidth: 2,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+        axisLabelVisible: true,
+        title: 'Уровень поддержки'
     });
-    return data;
-}
-
-// Загрузка и отображение графика
-async function loadChart() {
-    try {
-        const response = await fetch('data.csv');
-        if (!response.ok) throw new Error('Ошибка загрузки data.csv');
-        const csvText = await response.text();
-        const candles = parseCSV(csvText);
-
-        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
-            width: 800,
-            height: 600
-        });
-        const candlestickSeries = chart.addCandlestickSeries();
-        candlestickSeries.setData(candles);
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-
-loadChart();
-// Добавление линий и прямоугольников
-async function addIndicatorData(chart, candlestickSeries) {
-    try {
-        const response = await fetch('indicator.json');
-        if (!response.ok) throw new Error('Ошибка загрузки indicator.json');
-        const indicatorData = await response.json();
-
-        // Добавление горизонтальных линий
-        indicatorData.lines.forEach(line => {
-            candlestickSeries.createPriceLine({
-                price: line.price,
-                color: line.color,
-                lineWidth: 2,
-                lineStyle: LightweightCharts.LineStyle.Solid,
-                axisLabelVisible: true,
-                title: line.title || ''
-            });
-        });
-
-        // Добавление прямоугольников
-        const rectangleSeriesView = {
-            draw: (context, options) => {
-                const timeScale = options.timeScale;
-                const priceScale = options.priceScale;
-                indicatorData.rectangles.forEach(rect => {
-                    const x1 = timeScale.timeToCoordinate(rect.startTime);
-                    const x2 = timeScale.timeToCoordinate(rect.endTime);
-                    const y1 = priceScale.priceToCoordinate(rect.startPrice);
-                    const y2 = priceScale.priceToCoordinate(rect.endPrice);
-                    if (x1 !== null && x2 !== null && y1 !== null && y2 !== null) {
-                        context.fillStyle = rect.color;
-                        context.fillRect(x1, y1, x2 - x1, y2 - y1);
-                    }
-                });
-            }
-        };
-        chart.addCustomSeries(rectangleSeriesView, {});
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-
-// Обновление loadChart
-async function loadChart() {
-    try {
-        const response = await fetch('data.csv');
-        if (!response.ok) throw new Error('Ошибка загрузки data.csv');
-        const csvText = await response.text();
-        const candles = parseCSV(csvText);
-
-        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
-            width: 800,
-            height: 600
-        });
-        const candlestickSeries = chart.addCandlestickSeries();
-        candlestickSeries.setData(candles);
-
-        await addIndicatorData(chart, candlestickSeries);
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-
-loadChart();
+})
+.catch(error => console.error('Ошибка:', error));

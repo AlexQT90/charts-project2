@@ -1,0 +1,12 @@
+[
+    {
+        "instrument": "AAPL",
+        "signal": "Buy",
+        "image": "images/aapl_chart.png"
+    },
+    {
+        "instrument": "GOOG",
+        "signal": "Sell",
+        "image": "images/goog_chart.png"
+    }
+]

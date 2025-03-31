@@ -3,28 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Финансовые графики</title>
+    <title>Сигналы</title>
+    <style>
+        /* Стили для таблицы */
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        /* Стили для модального окна */
+        #imageModal {
+            display: none; /* По умолчанию скрыто */
+            position: fixed; /* Поверх всего контента */
+            top: 10%; /* Отступ сверху */
+            left: 10%; /* Отступ слева */
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Тень для эффекта "всплытия" */
+            z-index: 1000; /* Убедимся, что модальное окно поверх таблицы */
+        }
+        #chartImage {
+            max-width: 80vw; /* Максимальная ширина 80% от ширины экрана */
+            max-height: 80vh; /* Максимальная высота 80% от высоты экрана */
+        }
+    </style>
 </head>
 <body>
-    <div id="tvchart"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-    new TradingView.widget({
-        "container_id": "tvchart",
-        "width": 980,
-        "height": 610,
-        "symbol": "NYMEX:CL1!",  // Укажите символ (например, акции Apple)
-        "interval": "1",         // Интервал графика (D - дневной)
-        "timezone": "Etc/UTC",
-        "theme": "Dark",        // Тема (светлая или темная)
-        "style": "1",            // Тип графика (1 - свечи)
-        "locale": "en",          // Язык интерфейса
-        "toolbar_bg": "#f1f3f6", // Цвет фона панели инструментов
-        "enable_publishing": false,
-        "allow_symbol_change": true,
-        "details": true,
-        "hideideas": true
-    });
+    <h1>Сигналы</h1>
+    
+    <!-- Таблица для отображения сигналов -->
+    <table id="signalsTable">
+        <tr>
+            <th>Инструмент</th>
+            <th>Сигнал</th>
+            <th>Действие</th>
+        </tr>
+    </table>
+
+    <!-- Модальное окно для изображения -->
+    <div id="imageModal">
+        <img id="chartImage" src="" alt="График">
+        <br>
+        <button onclick="closeModal()">Закрыть</button>
+    </div>
+
+    <script>
+        // Функция загрузки данных из signals.json и заполнения таблицы
+        async function loadSignals() {
+            try {
+                const response = await fetch('signals.json');
+                const signals = await response.json();
+                const table = document.getElementById('signalsTable');
+
+                // Для каждого сигнала добавляем строку в таблицу
+                signals.forEach(signal => {
+                    const row = table.insertRow();
+                    row.insertCell(0).textContent = signal.instrument; // Инструмент
+                    row.insertCell(1).textContent = signal.signal;     // Сигнал
+                    const actionCell = row.insertCell(2);              // Ячейка для кнопки
+                    const button = document.createElement('button');
+                    button.textContent = 'Показать график';
+                    button.onclick = () => showImage(signal.image);    // При клике показываем изображение
+                    actionCell.appendChild(button);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки сигналов:', error);
+            }
+        }
+
+        // Функция показа изображения в модальном окне
+        function showImage(imagePath) {
+            document.getElementById('chartImage').src = imagePath; // Устанавливаем путь к изображению
+            document.getElementById('imageModal').style.display = 'block'; // Показываем модальное окно
+        }
+
+        // Функция закрытия модального окна
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none'; // Скрываем модальное окно
+        }
+
+        // Загружаем сигналы при загрузке страницы
+        loadSignals();
     </script>
 </body>
 </html>

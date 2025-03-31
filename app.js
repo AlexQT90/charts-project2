@@ -4,11 +4,11 @@ function parseCSV(csvText) {
     const data = lines.slice(1).map(line => {
         const values = line.split(',');
         return {
-            time: values[0], // Формат, например, 'YYYY-MM-DD'
-            open: parseFloat(values[1]),
-            high: parseFloat(values[2]),
-            low: parseFloat(values[3]),
-            close: parseFloat(values[4]),
+            time: values[0]; // Формат, например, 'YYYY-MM-DD'
+            open: parseFloat(values[1]);
+            high: parseFloat(values[2]);
+            low: parseFloat(values[3]);
+            close: parseFloat(values[4]);
         };
     });
     return data;
